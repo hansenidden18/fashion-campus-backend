@@ -1,0 +1,25 @@
+version: "3.9"
+
+services: 
+    flask-app:
+      build:
+        context: ./
+      ports:
+        - 5000:5000
+
+    # mysql:
+    #     image: mysql
+    #     container_name: mysql
+    #     restart: unless-stopped
+    #     tty: true
+    #     ports: 
+    #         - "4306:3306"
+    #     volumes: 
+    #         - ./mysql:/var/lib/mysql
+    #     environment: 
+    #         MYSQL_DATABASE: python_docker
+    #         MYSQL_USER: user
+    #         MYSQL_PASSWORD: user
+    #         MYSQL_ROOT_PASSWORD: root
+    #         SERVICE_TAGS: dev
+    #         SERVICE_NAME: mysql
