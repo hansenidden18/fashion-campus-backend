@@ -5,5 +5,4 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT [ "python" ]
-CMD [ "flask-server/main.py" ]
+CMD ["python", "flask-server/main.py" ]

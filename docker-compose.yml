@@ -1,25 +1,29 @@
 version: "3.9"
-
-services: 
+services:
     flask-app:
-      build:
-        context: ./
-      ports:
-        - 5000:5000
+        build:
+            context: .
+            dockerfile: Dockerfile
+        tty: true
+        working_dir: /app
+        restart: unless-stopped
+        ports:
+            - 5000:5000
+        depends_on:
+            - postgres
+        volumes:
+            - ./:/app
 
-    # mysql:
-    #     image: mysql
-    #     container_name: mysql
-    #     restart: unless-stopped
-    #     tty: true
-    #     ports: 
-    #         - "4306:3306"
-    #     volumes: 
-    #         - ./mysql:/var/lib/mysql
-    #     environment: 
-    #         MYSQL_DATABASE: python_docker
-    #         MYSQL_USER: user
-    #         MYSQL_PASSWORD: user
-    #         MYSQL_ROOT_PASSWORD: root
-    #         SERVICE_TAGS: dev
-    #         SERVICE_NAME: mysql
+    postgres:
+        image: postgres
+        container_name: postgres
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./postgres:/var/lib/postgres
+        environment:
+            POSTGRES_DB: python_docker
+            POSTGRES_USER: posgres
+            POSTGRES_PASSWORD: user
