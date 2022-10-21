@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 class Product(db.Model):
     __tablename__ = 'product'
-    id = db.Column(db.String(100),primary_key=True, nullable=True)
+    id = db.Column(db.String(100),primary_key=True, nullable=False)
     title = db.Column(db.String(200))
     brand_name = db.Column(db.String(200))
     size = db.Column(ARRAY(db.String(100)))
