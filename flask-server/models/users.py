@@ -1,12 +1,21 @@
 from .base import db
 
-class VideoModel(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    views = db.Column(db.Integer, nullable=False)
-    likes = db.Column(db.Integer, nullable=False)
+class Users(db.Model):
+    __tablename__ = "users"
+    
+    id = db.Column(db.Integer, primary_key = True, nullable=False)
+    token = db.Column(db.String(100))
+    nama = db.Column(db.String(100))
+    email = db.Column(db.String(100))
+    phone_number = db.Column(db.Integer())
+    password = db.Column(db.String(100))
+    balance = db.Column(db.Id())
+    type = db.Column(db.String(100))
+    admin = db.Column(db.Boolean())
 
-    def __init__(self, name: str):
-        self.name = name
-    def __repr__(self, name, views, likes):
-        return f"Video(name = {name}, views = {views}, likes = {likes})"
+    def __init__(self, id:str):
+        return self.id == id
+    
+    def __repr__(self):
+        return f"Users(id = {self.id}, token = {self.token})"
+
