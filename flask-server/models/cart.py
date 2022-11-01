@@ -11,4 +11,8 @@ class Cart(db.model):
     image = db.Column(db.String(100))
     name = db.Column(db.String(100), db.ForeignKey('product.id'))
 
+    def __init__(self, id: str):
+        return self.id == id
     
+    def __repr__(self):
+        return f"Cart(id = {self.id}, name = {self.name})"

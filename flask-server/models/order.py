@@ -12,3 +12,9 @@ class Order(db.model):
     status = db.Column(db.String(100))
     total_price = db.Column(db.Integer)
     customer_id = db.Column(db.String(100), db.ForeignKey('users.id'))
+
+    def __init__(self, id: str):
+        return self.id == id
+    
+    def __repr__(self):
+        return f"Order(id = {self.id}, product =  {self.product})"
