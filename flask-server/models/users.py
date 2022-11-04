@@ -9,7 +9,7 @@ class Users(db.Model):
     email = db.Column(db.String(100))
     phone_number = db.Column(db.Integer())
     password = db.Column(db.String(100))
-    balance = db.Column(db.Id())
+    balance = db.Column(db.Integer)
     type = db.Column(db.String(100))
     admin = db.Column(db.Boolean())
 

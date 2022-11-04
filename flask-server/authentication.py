@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from utils import run_query
 
 auth_bp = Blueprint("authentication", __name__, url_prefix="")
 
@@ -10,5 +11,3 @@ def add_user():
     email = body['email']
     phone_number = body['phone_number']
     password = body['password']
-
-    
