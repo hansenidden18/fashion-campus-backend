@@ -1,7 +1,7 @@
 from .base import db
 from sqlalchemy.dialects.postgresql import ARRAY
 
-class Cart(db.model):
+class Cart(db.Model):
     __tablename__ = "cart"
     
     id = db.Column(db.Integer, primary_key=True, unique=True)
