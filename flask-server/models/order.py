@@ -1,7 +1,7 @@
 from .base import db
 from sqlalchemy import func
 
-class Order(db.model):
+class Order(db.Model):
     __tablename__ = "order"
     
     id = db.Column(db.String(100), primary_key=True, nullable=False)
