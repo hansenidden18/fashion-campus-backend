@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from .utils import run_query
+from utils import run_query
 auth_bp = Blueprint("authentication", __name__, url_prefix="")
 
 @auth_bp.route("/sign-up", methods=["POST"])
