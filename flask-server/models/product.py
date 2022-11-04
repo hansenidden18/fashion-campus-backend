@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 class Product(db.Model):
     __tablename__ = 'product'
-    id = db.Column(db.String(100),primary_key=True, nullable=False)
+    id = db.Column(db.Integer,primary_key=True, unique=True)
     title = db.Column(db.String(200))
     brand_name = db.Column(db.String(200))
     size = db.Column(ARRAY(db.String(100)))
@@ -11,7 +11,7 @@ class Product(db.Model):
     image_url = db.Column(db.String(200))
     condition = db.Column(db.String(200))
     price = db.Column(db.Integer)
-    categories_id = db.Column(db.String(100), db.ForeignKey('categories.id'))
+    categories_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
 
     def __init__(self, id: str):
         return self.id == id

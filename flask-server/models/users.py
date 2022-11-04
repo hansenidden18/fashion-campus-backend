@@ -3,7 +3,7 @@ from .base import db
 class Users(db.Model):
     __tablename__ = "users"
     
-    id = db.Column(db.Integer, primary_key = True, nullable=False)
+    id = db.Column(db.Integer, primary_key = True, unique=True)
     token = db.Column(db.String(100))
     nama = db.Column(db.String(100))
     email = db.Column(db.String(100))

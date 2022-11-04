@@ -2,8 +2,9 @@ from .base import db
 
 class User_Address(db.Model):
     __tablename__ = 'user_address'
-    id = db.Column(db.String(100),primary_key=True, nullable=False)
-    user_id = db.Column(db.String(100), db.ForeignKey('users.id'))
+
+    id = db.Column(db.Integer,primary_key=True, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     name = db.Column(db.String(200))
     phone_number = db.Column(db.Integer())
     address = db.Column(db.String(100))
