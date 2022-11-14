@@ -7,7 +7,7 @@ class Users(db.Model):
     token = db.Column(db.String(100))
     nama = db.Column(db.String(100))
     email = db.Column(db.String(100))
-    phone_number = db.Column(db.Integer())
+    phone_number = db.Column(db.String(15))
     password = db.Column(db.String(100))
     balance = db.Column(db.Integer)
     type = db.Column(db.String(100))
