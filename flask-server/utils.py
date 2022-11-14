@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, text
-
+from datetime import datetime, timedelta
+import jwt
 
 def get_engine():
     """Creating MySQL Engine to interact"""
@@ -22,3 +23,17 @@ def run_query(query, commit: bool = False):
             conn.commit()
         else:
             return [dict(row) for row in conn.execute(query)]
+
+def generate_jwt(payload: dict) -> str:
+    expired = datetime.now() + timedelta(days=1)
+    payload['expired'] = expired
+    return jwt.encode(payload, 'doaibu', algorithm='H5256')
+
+def jwt_verification(token: str) -> dict:
+    try:
+        decode_token = jwt.decode(token, 'doaibu', algorithm='H5256')
+        return decode_token
+    except jwt.ExpiredSignatureError:
+        raise Exception("Token already expired")
+    except jwt.InvalidTokenError:
+        raise Exception("Invalid Token")
