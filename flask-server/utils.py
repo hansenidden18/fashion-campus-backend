@@ -32,7 +32,7 @@ def generate_jwt(payload: dict) -> str:
 def jwt_verification(token: str) -> dict:
     try:
         decode_token = jwt.decode(token, 'doaibu', algorithm='HS256')
-        if decode_token['expired'] < datetime.now():
+        if decode_token['exp'] < datetime.now():
             return {"message":"Token expired"}
         return decode_token
     except jwt.ExpiredSignatureError:
