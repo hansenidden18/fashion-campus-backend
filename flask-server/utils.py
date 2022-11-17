@@ -26,12 +26,14 @@ def run_query(query, commit: bool = False):
 
 def generate_jwt(payload: dict) -> str:
     expired = datetime.now() + timedelta(days=1)
-    payload['expired'] = expired
-    return jwt.encode(payload, 'doaibu', algorithm='H5256')
+    payload['exp'] = expired
+    return jwt.encode(payload, 'doaibu', algorithm='HS256')
 
 def jwt_verification(token: str) -> dict:
     try:
-        decode_token = jwt.decode(token, 'doaibu', algorithm='H5256')
+        decode_token = jwt.decode(token, 'doaibu', algorithm='HS256')
+        if decode_token['exp'] < datetime.now():
+            return {"message":"Token expired"}
         return decode_token
     except jwt.ExpiredSignatureError:
         raise Exception("Token already expired")

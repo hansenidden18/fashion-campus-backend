@@ -16,9 +16,11 @@ docker exec -it final-project-startup-campus-flask-app-1 /bin/sh
 ```
 ls
 cd flask-server
+cd flask-server
 ```
 * Migrate the database
 ```
 $ flask db stamp head
 $ flask db migrate
 $ flask db upgrade
+```
