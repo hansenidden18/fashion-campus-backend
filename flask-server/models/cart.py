@@ -10,6 +10,7 @@ class Cart(db.Model):
     price = db.Column(db.Integer)
     image = db.Column(db.String(100))
     name = db.Column(db.Integer, db.ForeignKey('product.id'))
+    customer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __init__(self, id: str):
         return self.id == id
