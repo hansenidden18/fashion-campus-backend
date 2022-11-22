@@ -17,7 +17,13 @@ def create_app():
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
     
+    UPLOAD_FOLDER = 'static/uploads/'
+
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
     app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://posgres:user@postgres:5432/python_docker"
+    app.config
     db_url = app.config['SQLALCHEMY_DATABASE_URI']
     if not database_exists(db_url):
         create_database(db_url)
