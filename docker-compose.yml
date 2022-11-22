@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.3"
 services:
     flask-app:
         build:
@@ -27,3 +27,9 @@ services:
             POSTGRES_DB: python_docker
             POSTGRES_USER: posgres
             POSTGRES_PASSWORD: user
+    api:
+        image: raihanparl/startup-campus-fe:latest
+        ports:
+            - '3000:3000'
+        env_file:
+            - .env
