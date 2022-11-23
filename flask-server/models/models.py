@@ -17,7 +17,7 @@ def create_app():
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
     
-    UPLOAD_FOLDER = 'static/uploads/'
+    UPLOAD_FOLDER = 'static/'
 
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
