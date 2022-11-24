@@ -1,56 +1,43 @@
-from utils import get_engine, run_query
 from flask import Blueprint, request
-from sqlalchemy import (
-    MetaData,
-    Table,
-    delete,
-    insert,
-    select,
-)
-from sqlalchemy.exc import IntegrityError
+from utils import run_query
 
-home_bp = Blueprint("home", __name__, url_prefix="/home/banner")
+home_bp = Blueprint("home", __name__, url_prefix="")
 
 # Contoh
-@home_bp.route("", methods=["POST"])
+@home_bp.route("/home/banner", methods=["GET"])
 def add_home():
-    body = request.json
-    id = body["id"]
-    image = body["image"]
-    title = body["title"]
+    token = str(request.headers.get('token'))
+    if "message" in token:
+        return {"error": "User token expired, please re-login"}, 403
 
-    home = Table("home", MetaData(bind=get_engine()), autoload=True)
-    try:
-        run_query(insert(home).values({"id": id},{"image": image},{"title": title}), commit=True)
-        return {"message": f"Home {id}{image}{title} is added"}, 201
-    except IntegrityError:
-        # case: when the home already exists
-        return {"error": "Home with the same title already exists"}, 400
+    data = run_query(f"SELECT id, image_url, title FROM product")
+    if data:
+        data = {"data":[{
+                "id":d["id"],
+                "image":d["image_url"],
+                "title":d["title"]} for d in data]}
+    else:
+        data = []
 
-@home_bp.route("", methods=["DELETE"])
-def delete_home():
-    body = request.json
-    id = body["id"]
-    image = body["image"]
-    title = body["title"]
-
-    # check information about the book
-    home = Table("home", MetaData(bind=get_engine()), autoload=True)
-    home_details = run_query(select(home).where(home.c.id == id, image == image, title == title))
-
-    # case; book doesn't exist
-    if not home_details:
-        return {"error": "Home is not known"}, 400
-
-    # case: book is currently borrowed
-    borrower = home_details[0]["borrower"]
-    if borrower:
-        return {"error": f"Home is currently borrowed by {borrower}"}, 403
-
-    # remove book validly
-    run_query(delete(home).where(home.c.id == id, image == image, title == title), commit=True)
-    return {"message": f"Home {id}{image}{title} is removed"}
+    return data,200
 
 
+
+@home_bp.route("/home/categories", methods=["GET"])
+def add_categories():
+    token = str(request.headers.get('token'))
+    if "message" in token:
+        return {"error": "User token expired, please re-login"}, 403
+        
+    data = run_query(f"SELECT product.id, product.image FROM product JOIN categories on id GROUP BY categories.title")
+    if data:
+        data = {"data":[{
+                "id":d["id"],
+                "image":d["image_url"],
+                "category_name":d["title"]} for d in data]}
+    else:
+        data = []
+
+    return data,200
 
 
