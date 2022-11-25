@@ -3,18 +3,17 @@ from utils import run_query, jwt_verification
 
 profile_bp = Blueprint("profile", __name__, url_prefix="")
 
-# Contoh
+# USER
 @profile_bp.route("/user", methods=["GET"])
-def add_profile():
+def get_user():
     token = str(request.headers.get('token'))
-    verif = jwt_verification(token)
-    if "message" in verif:
+    if "message" in token:
         return {"error": "User token expired, please re-login"}, 403
 
     data = run_query(f"SELECT nama, email, phone_number FROM users")
     if data:
         data = {"data":[{
-                "nama":d["nama"],
+                "name":d["nama"],
                 "email":d["email"],
                 "phone_number":d["phone_number"]} for d in data]}
     else:
@@ -22,6 +21,7 @@ def add_profile():
 
     return data,200
 
+#USER SHIPPING_ADDRESS
 @profile_bp.route("/user/shipping_address", methods=["POST"])
 def shipping_address():
 
@@ -49,6 +49,7 @@ def shipping_address():
     
     return {"message": "success, user created"}, 201
 
+#USER TOP UP BALANCE
 @profile_bp.route("/user/balance", methods=["POST"])
 def top_up_balance():
 
@@ -67,6 +68,7 @@ def top_up_balance():
     
     return {"message": "success, user created"}, 201
 
+#USER BALANCE
 @profile_bp.route("/user/balance", methods=["GET"])
 def balance():
     token = str(request.headers.get('token'))
@@ -83,9 +85,9 @@ def balance():
     return data,200
 
 
-# Contoh
+# USER ORDER
 @profile_bp.route("/user/order", methods=["GET"])
-def add_order():
+def get_order():
     token = str(request.headers.get('token'))
     verif = jwt_verification(token)
     if "message" in verif:
