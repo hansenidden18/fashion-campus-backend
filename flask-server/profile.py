@@ -32,7 +32,7 @@ def shipping_address():
     address = body['address']
     city = body['city']
 
-    data = run_query("SELECT users.nama, users.phone_number FROM user JOIN user_address on id GROUP BY user_address.address, user_address.city")
+    data = run_query("SELECT users.nama, users.phone_number FROM users JOIN user_address ON user_address.id=user_address.user_id GROUP BY user_address.user_id, users.nama, users.phone_number, user_address.city")
     if data:
         usernames = {d['nama']:d['phone_number']for d in data}
     else:
@@ -45,7 +45,7 @@ def shipping_address():
         return {"error": f"Username {name} already exists"}, 409
     if phone_number in usernames.values():
         return {"error": f"Username {phone_number} already exists"}, 409
-    run_query(f"INSERT INTO users (nama,phone_number, address, city) VALUES {name, phone_number,  address, city }", commit=True)
+    run_query(f"INSERT INTO user_address (name, phone_number, address, city) VALUES {name, phone_number,  address, city }", commit=True)
     
     return {"message": "success, user created"}, 201
 
