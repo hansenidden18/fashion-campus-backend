@@ -29,7 +29,7 @@ def get_category():
     if "message" in token:
         return {"error": "User token expired, please re-login"}, 403
 
-    data = run_query (f"SELECT product.id, product.image_url FROM product JOIN categories ON categories.id GROUP BY categories.title ORDER BY categories.title")
+    data = run_query (f"SELECT product.id, product.image_url FROM product JOIN categories ON categories.id=product.categories_id GROUP BY categories.title, product.id ORDER BY categories.title")
     if data:
         data = {"data":[{
                 "id":d["id"],
