@@ -10,8 +10,11 @@ class Order(db.Model):
     shipping = db.Column(db.String(100))
     shipping_fee = db.Column(db.Integer)
     status = db.Column(db.String(100))
+    quantity = db.Column(db.Integer)
+    size = db.Column(db.String(10))
     total_price = db.Column(db.Integer)
     customer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    shipping_address = db.Column(db.Integer, db.ForeignKey('user_address.id'))
 
     def __init__(self, id: str):
         return self.id == id

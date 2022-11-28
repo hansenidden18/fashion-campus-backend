@@ -7,23 +7,29 @@ profile_bp = Blueprint("profile", __name__, url_prefix="")
 @profile_bp.route("/user", methods=["GET"])
 def get_user():
     token = str(request.headers.get('token'))
-    if "message" in token:
+    verif = jwt_verification(token)
+    if "message" in verif:
         return {"error": "User token expired, please re-login"}, 403
 
-    data = run_query(f"SELECT nama, email, phone_number FROM users")
+    data = run_query(f"SELECT nama, email, phone_number FROM users WHERE token = '{token}'")
     if data:
-        data = {"data":[{
+        data = [{
                 "name":d["nama"],
                 "email":d["email"],
-                "phone_number":d["phone_number"]} for d in data]}
+                "phone_number":d["phone_number"]} for d in data ]
     else:
         data = []
 
-    return data,200
+    return data[0],200
 
 #USER SHIPPING_ADDRESS
 @profile_bp.route("/user/shipping_address", methods=["POST"])
 def shipping_address():
+    
+    token = str(request.headers.get('token'))
+    verif = jwt_verification(token)
+    if "message" in verif:
+        return {"error": "User token expired, please re-login"}, 403
 
     body = request.json
     
@@ -31,58 +37,59 @@ def shipping_address():
     phone_number = body['phone_number']
     address = body['address']
     city = body['city']
-
-    data = run_query("SELECT users.nama, users.phone_number FROM users JOIN user_address ON user_address.id=user_address.user_id GROUP BY user_address.user_id, users.nama, users.phone_number, user_address.city")
-    if data:
-        usernames = {d['nama']:d['phone_number']for d in data}
-    else:
-        usernames = {}
-    if data:
-        usernames = {d['address']:d['city']for d in data}
-    else:
-        usernames = {}
-    if name in usernames:
-        return {"error": f"Username {name} already exists"}, 409
-    if phone_number in usernames.values():
-        return {"error": f"Username {phone_number} already exists"}, 409
-    run_query(f"INSERT INTO user_address (name, phone_number, address, city) VALUES {name, phone_number,  address, city }", commit=True)
     
-    return {"message": "success, user created"}, 201
+    data = run_query(f"SELECT address FROM user_address WHERE user_id = (SELECT id FROM users WHERE token = '{token}') AND address = '{address}'")
+    if data:
+        run_query(f"UPDATE user_address SET name = '{name}', phone_number = {phone_number}, address = {address}, city = {city} WHERE user_id = (SELECT id FROM users WHERE token = '{token}')")
+    else:
+        run_query(f"INSERT INTO user_address (user_id, name, phone_number, address, city) VALUES (SELECT id FROM users WHERE nama = '{name}'),{name, phone_number,  address, city }", commit=True)
+    
+    return {"message": "address successfully changed"}, 200
 
 #USER TOP UP BALANCE
 @profile_bp.route("/user/balance", methods=["POST"])
 def top_up_balance():
 
+    token = str(request.headers.get('token'))
+    verif = jwt_verification(token)
+    if "message" in verif:
+        return {"error": "User token expired, please re-login"}, 403
+    
     body = request.json
     
-    amount = body['total_price']
+    amount = int(body['amount'])
 
-    data = run_query("SELECT total_price FROM order")
+    if amount <= 0:
+        return {"message": "Amount must be a positive integer"}, 400
+
+    data = run_query(f"SELECT balance FROM users WHERE token = '{token}'")
     if data:
-        usernames = {d['total_price'] for d in data}
+        data = [d['balance'] for d in data]
     else:
-        usernames = {}
-    if amount in usernames:
-        return {"error": f"Username {amount} already exists"}, 409
-    run_query(f"INSERT INTO order (total_price) VALUES {amount}", commit=True)
+        data = [0]
     
-    return {"message": "success, user created"}, 201
+    new_balance = data[0] + amount
+    run_query(f"UPDATE users SET balance = {new_balance} WHERE token = '{token}'")
+    
+    return {"message": "balance topped-up successfully"}, 200
 
 #USER BALANCE
 @profile_bp.route("/user/balance", methods=["GET"])
 def balance():
+
     token = str(request.headers.get('token'))
-    if "message" in token:
+    verif = jwt_verification(token)
+    if "message" in verif:
         return {"error": "User token expired, please re-login"}, 403
-        
-    data = run_query(f"SELECT balance FROM users")
+    
+    data = run_query(f"SELECT balance FROM users WHERE token = '{token}'")
     if data:
-        data = {"data":[{
-                "balance":d["balance"]} for d in data]}
+        data = [{
+                "balance":d["balance"]} for d in data]
     else:
         data = []
 
-    return data,200
+    return data[0],200
 
 
 # USER ORDER
@@ -93,27 +100,60 @@ def get_order():
     if "message" in verif:
         return {"error": "User token expired, please re-login"}, 403
 
-    data = run_query(f"SELECT order.id, order.time_created FROM order JOIN cart on id GROUP BY cart.id, cart.size, cart.price, cart.image, cart.name JOIN user_address on id GROUP BY user_address.name, user_address.phone_number, user_address.address, user_address.city")
-    if data:
-        data = {"data":[{
-                "id":d["id"],
-                "create_at":d["time_created"],}],
-                    "product":[
-                        {
-                            "id":d["id"],
-                            "size":d["size"],
-                            "quantity":d["quantity"],
-                            "price":d["price"],
-                            "image":d["image"],
-                            "name":d["brand_name"],}],
-                "shipping_method":d["shipping"],
-                "shipping_address":[
-                        {
-                            "name":d["name"],
-                            "phone_number":d["phone_number"],
-                            "address":d["address"],
-                            "city":d["city"],}],}
+    users = run_query(f"SELECT id FROM users WHERE token = '{token}'")
+    if users:
+        user = [d['id'] for d in users]
     else:
-        data = []
+        return {"message": "Unauthorized user"}, 401
+    
+    orders = run_query(f"SELECT * FROM order WHERE customer_id = {user[0]} ORDER BY time_created DESC")
+    
+    order_items = {}
+    order_address = {}
+    for order in orders:
+        items = run_query(f'''
+                            SELECT  order.product
+                                    product.price,
+                                    order.quantity,
+                                    order.size,
+                                    product.image_url,
+                                    product.title FROM orders
+                            JOIN (SELECT product.id, product.price, product.image_url, product.title FROM product) AS prod ON prod.id = order.product
+                            WHERE order.id == {order["id"]}
+        ''')
 
-    return data,200
+        order_items[order["id"]] = [
+            {
+                'id': item["product"],
+                'details': {
+                    'quantity': item["quantity"],
+                    'size': item["size"]
+                },
+                'price': item["price"],
+                'image': item["image_url"],
+                'name': item["title"]
+            } for item in items
+        ]
+
+        shipping_address = run_query(f"SELECT * FROM user_address WHERE id = {order["shipping_address"]}")
+
+        for address in shipping_address:
+            order_address[order["id"]] = {
+                "name": address["name"],
+                "phone_number": address["phone_number"],
+                "address": address["address"],
+                "city": address["city"]
+            }
+
+
+    return {
+        'data': [
+            {
+                'id': order["id"],
+                'created_at': order["time_created"],
+                'products': order_items[order["id"]],
+                'shipping_method': order["shipping"],
+                'shipping_address': order_address[order["id"]]
+            } for order in orders
+        ]
+    },200
