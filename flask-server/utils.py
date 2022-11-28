@@ -24,6 +24,17 @@ def run_query(query, commit: bool = False):
         else:
             return [dict(row) for row in conn.execute(query)]
 
+def find(statement, params = None):
+    engine = get_engine()
+    with engine.connect() as conn:
+        return [dict(row) for row in conn.execute(text(statement), params)]
+
+def first(statement, params = None):
+    row = find(statement, params)
+    if len(row) == 0:
+        return None
+    return row[0]
+
 def generate_jwt(payload: dict) -> str:
     expired = datetime.now() + timedelta(days=1)
     payload['exp'] = expired
