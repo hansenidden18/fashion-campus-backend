@@ -2,6 +2,11 @@ from sqlalchemy import create_engine, text
 from datetime import datetime, timedelta
 import jwt
 
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+def allowed_file(filename):
+	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 def get_engine():
     """Creating MySQL Engine to interact"""
     return create_engine("postgresql+psycopg2://posgres:user@postgres:5432/python_docker", future=True)
@@ -47,6 +52,6 @@ def jwt_verification(token: str) -> dict:
             return {"message":"Token expired"}
         return decode_token
     except jwt.ExpiredSignatureError:
-        raise Exception("Token already expired")
+        return {"message":"Token expired"}
     except jwt.InvalidTokenError:
         raise Exception("Invalid Token")
