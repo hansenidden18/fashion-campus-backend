@@ -1,6 +1,5 @@
 from sqlalchemy import create_engine, text
 from datetime import datetime, timedelta
-import jwt
 
 def get_engine():
     """Creating MySQL Engine to interact"""
@@ -26,16 +25,17 @@ def run_query(query, commit: bool = False):
 
 def generate_jwt(payload: dict) -> str:
     expired = datetime.now() + timedelta(days=1)
-    payload['exp'] = expired
-    return jwt.encode(payload, 'doaibu', algorithm='HS256')
+    payload['expired'] = expired
+    return jwt.encode(payload, 'doaibu', algorithm='H5256')
 
 def jwt_verification(token: str) -> dict:
     try:
-        decode_token = jwt.decode(token, 'doaibu', algorithm='HS256')
-        if decode_token['exp'] < datetime.now():
-            return {"message":"Token expired"}
+        decode_token = jwt.decode(token, 'doaibu', algorithm='H5256')
         return decode_token
     except jwt.ExpiredSignatureError:
         raise Exception("Token already expired")
     except jwt.InvalidTokenError:
         raise Exception("Invalid Token")
+    
+def productid_checker(id):
+    return run_query(f"SELECT * FROM product WHERE id={id}")
