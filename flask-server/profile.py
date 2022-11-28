@@ -135,7 +135,7 @@ def get_order():
             } for item in items
         ]
 
-        shipping_address = run_query(f"SELECT * FROM user_address WHERE id = {order["shipping_address"]}")
+        shipping_address = run_query(f"SELECT * FROM user_address WHERE id = {order['shipping_address']}")
 
         for address in shipping_address:
             order_address[order["id"]] = {
