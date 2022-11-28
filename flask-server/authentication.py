@@ -52,29 +52,22 @@ def sign_in():
         user = [[d["nama"],d["token"], d["phone_number"]] for d in user]
         
     if user[0][1]:
-        decoded_token = jwt_verification(user[0][1])
-        if "message" in decoded_token:
-            if decoded_token == "Token expired":
-                run_query(f"UPDATE users SET token = NULL WHERE nama = '{user[0][0]}' AND email = '{email}'", commit=True)
-                return {"error", "Token already expired re-login please"}, 400
-        
-        return {
-            "user_information":{
-                "name": user[0][0],
-                "email": email,
-                "phone_number": user[0][2],
-                "type": "buyer"
-            },
-            "token": decoded_token,
-            "message": "Login success"
-        }, 200
+        try:
+            decoded_token = jwt_verification(user[0][1])
+            if "message" in decoded_token:
+                if decoded_token == "Token expired":
+                    run_query(f"UPDATE users SET token = NULL WHERE nama = '{user[0][0]}' AND email = '{email}'", commit=True)
+                    return {"error": "Token already expired re-login please"}, 400
+        except Exception:
+            run_query(f"UPDATE users SET token = NULL WHERE nama = '{user[0][0]}' AND email = '{email}'", commit=True)
+            return {"error": "Token error re-login please"}, 400
         
 
     token = {'email': email, 'password': password}
     token = generate_jwt(token)
 
     run_query(f"UPDATE users SET token = '{token}' WHERE email = '{email}' AND password = '{password}'", commit=True)
-    return  {
+    return {
             "user_information":{
                 "name": user[0][0],
                 "email": email,
