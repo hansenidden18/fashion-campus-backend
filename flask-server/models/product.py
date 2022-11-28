@@ -12,6 +12,8 @@ class Product(db.Model):
     condition = db.Column(db.String(200))
     price = db.Column(db.Integer)
     categories_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    soft_delete = db.Column(db.Boolean, default=False)
+
 
     def __init__(self, id: str):
         return self.id == id

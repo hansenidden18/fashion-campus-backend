@@ -5,6 +5,7 @@ class Categories(db.Model):
     
     id = db.Column(db.Integer, primary_key = True, unique=True)
     title = db.Column(db.String(200))
+    soft_delete = db.Column(db.Boolean, default=False)
 
     def __init__(self, id:str):
         return self.id == id
