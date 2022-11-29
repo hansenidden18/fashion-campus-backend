@@ -20,7 +20,7 @@ def get_user():
     else:
         data = []
 
-    return data[0],200
+    return {'data':data},200
 
 #USER SHIPPING_ADDRESS
 @profile_bp.route("/user/shipping_address", methods=["POST"])
@@ -112,13 +112,13 @@ def get_order():
     order_address = {}
     for order in orders:
         items = run_query(f'''
-                            SELECT  order.product
+                            SELECT  "order".product
                                     product.price,
-                                    order.quantity,
-                                    order.size,
+                                    "order".quantity,
+                                    "order".size,
                                     product.image_url,
-                                    product.title FROM orders
-                            JOIN (SELECT product.id, product.price, product.image_url, product.title FROM product) AS prod ON prod.id = order.product
+                                    product.title FROM "order"
+                            JOIN (SELECT product.id, product.price, product.image_url, product.title FROM product) AS prod ON prod.id = "order".product
                             WHERE order.id == {order["id"]}
         ''')
 

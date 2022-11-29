@@ -92,7 +92,10 @@ def create_order():
     user_id = first(f"SELECT id FROM users WHERE token = {token}")
     data = run_query(f"SELECT * FROM cart WHERE customer_id = {user_id}")
     if data:
+        quantity = [d['quantity'] for d in data]
+        size = [ d['size'] for d in data]
         data = [d['price']*d['quantity'] for d in data]
+        product_id = [d['name'] for d in data]
     
     total_price  = sum(data)
     if shipping_method == "regular":
@@ -108,12 +111,21 @@ def create_order():
         city
     }''',commit=True)
 
-    run_query(f'''INSERT INTO order(shipping, shipping_fee, status, total_price, customer_id) VALUES {
+    address_id = run_query(f"SELECT id FROM user_address WHERE user_id = {user_id}, name = {name}, address = '{address}', city = '{city}'")
+    if address_id:
+        ids = [ d["id"] for d in address_id]
+    else:
+        ids = None
+    run_query(f'''INSERT INTO "order"(shipping, shipping_fee, status, total_price, customer_id, shipping_address, quantity, size, product) VALUES {
         shipping_method,
         price,
         "Processed",
         total_price,
-        user_id
+        user_id,
+        ids[0],
+        quantity[0],
+        size[0][0],
+        product_id[0]
         }''')
 
     return {"message":"order success"}, 200
