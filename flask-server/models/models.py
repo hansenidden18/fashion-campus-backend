@@ -8,11 +8,11 @@ from profile import profile_bp
 from categories import categories_bp
 from flask_migrate import Migrate
 from sqlalchemy_utils import create_database, database_exists
-
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
-
+    CORS(app)
     # always register your blueprint(s) when creating application
     blueprints = [cart_bp, admin_bp, auth_bp, home_bp, product_bp, profile_bp, categories_bp]
     for blueprint in blueprints:

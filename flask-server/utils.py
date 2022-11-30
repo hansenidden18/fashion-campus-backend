@@ -43,18 +43,11 @@ def first(statement, params = None):
 def generate_jwt(payload: dict) -> str:
     expired = datetime.now() + timedelta(days=1)
     payload['exp'] = expired
-    return jwt.encode(payload, 'doaibu', algorithm='HS256')
+    return jwt.encode(payload, 'doaibu', 'HS256')
 
 def jwt_verification(token: str) -> dict:
-    try:
-        decode_token = jwt.decode(token, 'doaibu', algorithm='HS256')
-        if decode_token['exp'] < datetime.now():
-            return {"message":"Token expired"}
-        return decode_token
-    except jwt.ExpiredSignatureError:
-        raise Exception("Token already expired")
-    except jwt.InvalidTokenError:
-        raise Exception("Invalid Token")
+    decode_token = jwt.decode(token, 'doaibu', algorithms='HS256')
+    return decode_token
     
 def productid_checker(id):
     return run_query(f"SELECT * FROM product WHERE id={id}")

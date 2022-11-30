@@ -6,7 +6,7 @@ class User_Address(db.Model):
     id = db.Column(db.Integer,primary_key=True, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     name = db.Column(db.String(200))
-    phone_number = db.Column(db.Integer())
+    phone_number = db.Column(db.String(100))
     address = db.Column(db.String(100))
     city = db.Column(db.String(100))
 

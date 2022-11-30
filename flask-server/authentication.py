@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from utils import run_query, generate_jwt, jwt_verification
-
-auth_bp = Blueprint("authentication", __name__, url_prefix="")
+from datetime import datetime, timedelta
+import jwt
+auth_bp = Blueprint("authentication", __name__)
 
 @auth_bp.route("/sign-up", methods=["POST"])
 def sign_up():
@@ -49,18 +50,19 @@ def sign_in():
     
     user = run_query(f"SELECT * from users WHERE email = '{email}'")
     if user:
+        user_token = [d['token'] for d in user]
         user = [[d["nama"],d["token"], d["phone_number"]] for d in user]
         
-    if user[0][1]:
+    if user_token[0]:
         try:
-            decoded_token = jwt_verification(user[0][1])
-            if "message" in decoded_token:
-                if decoded_token == "Token expired":
-                    run_query(f"UPDATE users SET token = NULL WHERE nama = '{user[0][0]}' AND email = '{email}'", commit=True)
-                    return {"error": "Token already expired re-login please"}, 400
-        except Exception:
+            decoded_token = jwt_verification(user_token[0])
+            print(decoded_token)
+        except:
             run_query(f"UPDATE users SET token = NULL WHERE nama = '{user[0][0]}' AND email = '{email}'", commit=True)
             return {"error": "Token error re-login please"}, 400
+        # if decoded_token['exp'] - (datetime.now() + timedelta(days=1)) >= timedelta(seconds=1):
+        #     run_query(f"UPDATE users SET token = NULL WHERE nama = '{user[0][0]}' AND email = '{email}'", commit=True)
+        #     return {"error": "Token already expired re-login please"}, 400
         
 
     token = {'email': email, 'password': password}
