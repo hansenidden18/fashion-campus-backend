@@ -51,3 +51,21 @@ def jwt_verification(token: str) -> dict:
     
 def productid_checker(id):
     return run_query(f"SELECT * FROM product WHERE id={id}")
+
+def admin_token_checker(token):
+    verif = jwt_verification(token)
+    usercheck = run_query(f"SELECT * FROM users WHERE token='{token}' and admin=True")
+    if "message" in verif:
+        return {"error": "User token expired, please re-login"}, 403
+    elif not usercheck:
+        return {"error": "Unauthorized User"}, 401   
+
+    
+    
+def user_token_checker(token):
+    verif = jwt_verification(token)
+    usercheck = run_query(f"SELECT * FROM users WHERE token='{token}' and admin=False")
+    if "message" in verif:
+        return {"error": "User token expired, please re-login"}, 403
+    elif not usercheck:
+        return {"error": "Unauthorized User"}, 401   
