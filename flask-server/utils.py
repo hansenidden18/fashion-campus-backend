@@ -1,5 +1,7 @@
 from sqlalchemy import create_engine, text
 from datetime import datetime, timedelta
+from flask import request
+import jwt
 
 def get_engine():
     """Creating MySQL Engine to interact"""
@@ -25,17 +27,33 @@ def run_query(query, commit: bool = False):
 
 def generate_jwt(payload: dict) -> str:
     expired = datetime.now() + timedelta(days=1)
-    payload['expired'] = expired
-    return jwt.encode(payload, 'doaibu', algorithm='H5256')
+    payload['exp'] = expired
+    return jwt.encode(payload, 'doaibu', algorithm='HS256')
+
+# def generate_admin_jwt(payload: dict) -> str:
+#     expired = datetime.now() + timedelta(days=1)
+#     payload['exp'] = expired
+#     return jwt.encode(payload, 'doaibu', algorithm='HS256')
+
 
 def jwt_verification(token: str) -> dict:
-    try:
-        decode_token = jwt.decode(token, 'doaibu', algorithm='H5256')
-        return decode_token
-    except jwt.ExpiredSignatureError:
-        raise Exception("Token already expired")
-    except jwt.InvalidTokenError:
-        raise Exception("Invalid Token")
+    decode_token = jwt.decode(token, 'doaibu', algorithms='HS256')
+    return decode_token
+
+def admin_token_checker(token):
+    verif = jwt_verification(token)
+    usercheck = run_query(f"SELECT * FROM users WHERE token='{token}' and admin=True")
+    if "message" in verif:
+        return {"error": "User token expired, please re-login"}, 403
+    elif not usercheck:
+        return {"error": "Unauthorized User"}, 401   
+
     
-def productid_checker(id):
-    return run_query(f"SELECT * FROM product WHERE id={id}")
+    
+def user_token_checker(token):
+    verif = jwt_verification(token)
+    usercheck = run_query(f"SELECT * FROM users WHERE token='{token}' and admin=False")
+    if "message" in verif:
+        return {"error": "User token expired, please re-login"}, 403
+    elif not usercheck:
+        return {"error": "Unauthorized User"}, 401   

