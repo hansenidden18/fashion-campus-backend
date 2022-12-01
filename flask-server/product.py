@@ -102,47 +102,46 @@ def getproduct_list():
     else:
         sort = "ASC"
         return {"error" : "sort_by must be 'price_a_z' or 'price_z_a'!"}, 400
-    if not page_size:
-        page_size = 100
+    offset = page * page_size
     if not condition and not product_name and not category:
         data = run_query(f"SELECT id, image_url AS image, title, price \
                             FROM product WHERE price <= {price} \
-                            ORDER BY price {sort} LIMIT {page_size}")
+                            ORDER BY price {sort} LIMIT {page_size} OFFSET {offset}")
     elif not condition and not category:
         data = run_query(f"SELECT id, image_url AS image, title, price \
                             FROM product WHERE categories_id='{category}' \
                             AND title='{product_name}' AND price <= {price} \
-                            ORDER BY price {sort} LIMIT {page_size}")
+                            ORDER BY price {sort} LIMIT {page_size} OFFSET {offset}")
     elif not product_name and not category:
         data = run_query(f"SELECT id, image_url AS image, title, price \
                             FROM product WHERE categories_id='{category}' \
                             AND condition='{condition}' AND price <= {price} \
-                            ORDER BY price {sort} LIMIT {page_size}")
+                            ORDER BY price {sort} LIMIT {page_size} OFFSET {offset}")
     elif not product_name and not condition:
         data = run_query(f"SELECT id, image_url AS image, title, price \
                             FROM product WHERE categories_id='{category}' \
                             AND price <= {price} \
-                            ORDER BY price {sort} LIMIT {page_size}")
+                            ORDER BY price {sort} LIMIT {page_size} OFFSET {offset}")
     elif not condition:
         data = run_query(f"SELECT id, image_url AS image, title, price \
                             FROM product WHERE title='{product_name}' \
                             AND categories_id='{category}' AND price <= {price} \
-                            ORDER BY price {sort} LIMIT {page_size}")
+                            ORDER BY price {sort} LIMIT {page_size} OFFSET {offset}")
     elif not product_name:
         data = run_query(f"SELECT id, image_url AS image, title, price \
                             FROM product WHERE categories_id='{category}' \
                             AND condition='{condition}' AND price <= {price} \
-                            ORDER BY price {sort} LIMIT {page_size}")
+                            ORDER BY price {sort} LIMIT {page_size} OFFSET {offset}")
     elif not category:
         data = run_query(f"SELECT id, image_url AS image, title, price \
                             FROM product WHERE title='{product_name}' \
                             AND condition='{condition}' AND price <= {price} \
-                            ORDER BY price {sort} LIMIT {page_size}")
+                            ORDER BY price {sort} LIMIT {page_size} OFFSET {offset}")
     else:
         data = run_query(f"SELECT id, image_url AS image, title, price \
                             FROM product WHERE title='{product_name}' AND categories_id='{category}' \
                             AND condition='{condition}' AND price <= {price} \
-                            ORDER BY price {sort} LIMIT {page_size}")
+                            ORDER BY price {sort} LIMIT {page_size} OFFSET {offset}")
     if len(data) < 1:
         return {"error": "Product not found"}, 400
     else:
@@ -170,7 +169,7 @@ def getproducts_detail(id):
             "size": d["size"],
             "product_detail": d["product_detail"],
             "price": d["price"],
-            "image_url": join('/image/', d["image_url"]),
+            "images_url": [join('/image/', d["image_url"])],
             "category_id": d["category_id"],
             "category_name":d["category_name"]
         } for d in data]

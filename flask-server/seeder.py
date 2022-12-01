@@ -10,3 +10,5 @@
 # INSERT INTO categories(title) VALUES('DRESS');
 # INSERT INTO categories(title) VALUES('JEANS');
 # INSERT INTO categories(title) VALUES('SHIRT');
+
+# INSERT INTO "order"(product, shipping, shipping_fee, status, quantity, size, total_price, customer_id, shipping_address) VALUES(1, 'next day', 30000, 'Delivered', 3, 'S', 300000, 1, 1);

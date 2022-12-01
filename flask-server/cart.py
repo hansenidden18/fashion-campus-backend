@@ -30,6 +30,36 @@ def get_cart():
 
     return {"data":data},200
 
+@cart_bp.route("/cart", methods=["POST"])
+def create_cart():
+
+    token = str(request.headers.get('Authentication'))
+    verif = jwt_verification(token)
+    
+    body = request.json
+    product_id = body["id"]
+    quantity = body["quantity"]
+    size = body["size"]
+
+    data = run_query(f"SELECT price,image_url FROM product WHERE id= {product_id}")
+    if data:
+        price = [d['price'] for d in data]
+        image = [d['image_url'] for d in data]
+    user = run_query(f"SELECT id FROM users WHERE email='{verif['email']}' AND password='{verif['password']}'")
+    if user:
+        user_id = [d['id'] for d in user]
+    run_query(f'''
+                INSERT INTO cart(quantity, size, price, image, name, customer_id) VALUES({
+                    quantity,
+                    size,
+                    price[0],
+                    image[0],
+                    product_id,
+                    user_id[0]
+                })
+    ''',commit=True)
+
+
 @cart_bp.route("/user/shipping_address", methods=["GET"])
 def get_shipping():
 
