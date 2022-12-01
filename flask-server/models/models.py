@@ -1,13 +1,13 @@
 from flask import Flask
 from cart import cart_bp
-from admin import admin_sales_bp
+from admin_sales import admin_sales_bp
 from authentication import auth_bp
 from home import home_bp
 from product import product_bp
 from profile import profile_bp
-from categories import categories_bp
 from admin_product import admin_product_bp
 from admin_order import admin_order_bp
+from categories import categories_bp
 from flask_migrate import Migrate
 from sqlalchemy_utils import create_database, database_exists
 from flask_cors import CORS

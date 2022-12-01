@@ -133,7 +133,7 @@ def get_order():
                     'size': item["size"]
                 },
                 'price': item["price"],
-                'image': join('/image/',item["image_url"]),
+                'image': join('/image/',item["image_url"][0]),
                 'name': item["title"]
             } for item in items
         ]

@@ -53,7 +53,7 @@ def create_cart():
                     quantity,
                     size,
                     price[0],
-                    image[0],
+                    image[0][0],
                     product_id,
                     user_id[0]
                 })

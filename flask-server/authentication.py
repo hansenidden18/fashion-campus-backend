@@ -28,7 +28,7 @@ def sign_up():
         return {"error": f"Username {name} already exists"}, 409
     if email in usernames.values():
         return {"error": f"Username {email} already exists"}, 409
-    run_query(f"INSERT INTO users (nama, email, phone_number, password, balance) VALUES {name, email, phone_number,  password, 0}", commit=True)
+    run_query(f"INSERT INTO users (nama, email, phone_number, password, balance, type) VALUES {name, email, phone_number,  password, 0, 'buyer'}", commit=True)
     
     return {"message": "success, user created"}, 201
 
@@ -51,7 +51,7 @@ def sign_in():
     user = run_query(f"SELECT * from users WHERE email = '{email}'")
     if user:
         user_token = [d['token'] for d in user]
-        user = [[d["nama"],d["token"], d["phone_number"]] for d in user]
+        user = [[d["nama"],d["token"], d["phone_number"], d['type']] for d in user]
         
     if user_token[0]:
         try:
@@ -74,7 +74,7 @@ def sign_in():
                 "name": user[0][0],
                 "email": email,
                 "phone_number": user[0][2],
-                "type": "buyer"
+                "type": user[0][3]
             },
             "token": token,
             "message": "Login success"

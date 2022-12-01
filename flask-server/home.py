@@ -28,7 +28,7 @@ def get_category():
     if data:
         data = {"data":[{
                 "id":d["id"],
-                "image":join('/image/',d["image_url"]),
+                "image":join('/image/',d["image_url"][0]),
                 "title":d["title"]} for d in data]}
     else:
         data = []

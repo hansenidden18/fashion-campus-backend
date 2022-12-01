@@ -54,17 +54,14 @@ def productid_checker(id):
 
 def admin_token_checker(token):
     verif = jwt_verification(token)
-    usercheck = run_query(f"SELECT * FROM users WHERE token='{token}' and admin=True")
-    if "message" in verif:
-        return {"error": "User token expired, please re-login"}, 403
-    elif not usercheck:
-        return {"error": "Unauthorized User"}, 401   
+    usercheck = run_query(f"SELECT * FROM users WHERE email='{verif['email']}' and type='seller'")
+    if not usercheck:
+        return False
+    return True
 
-    
-    
 def user_token_checker(token):
     verif = jwt_verification(token)
-    usercheck = run_query(f"SELECT * FROM users WHERE token='{token}' and admin=False")
+    usercheck = run_query(f"SELECT * FROM users WHERE token='{token}' and type='buyer'")
     if "message" in verif:
         return {"error": "User token expired, please re-login"}, 403
     elif not usercheck:
