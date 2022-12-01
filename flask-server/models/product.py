@@ -5,7 +5,6 @@ class Product(db.Model):
     __tablename__ = 'product'
     id = db.Column(db.Integer,primary_key=True, unique=True)
     title = db.Column(db.String(200))
-    brand_name = db.Column(db.String(200))
     size = db.Column(ARRAY(db.String(100)))
     product_detail = db.Column(db.String(200))
     image_url = db.Column(ARRAY(db.String(200)))

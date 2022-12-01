@@ -40,18 +40,26 @@ def create_product(): #ADMIN
     new_image = []
     i = 1
     for image in images:
-        head,tail = image.split(';')
-        _,ext = head.split('/')
-        _,msg = tail.splot(',')
-        with open(join(paths, product_name+ str(i) +"."+ext), "wb") as fh:
-            fh.write(base64.b64decode(msg))
-        new_image.append(product_name+ str(i) +"."+ext)
+        if 'data' in image[0:4]:
+            head,tail = image.split(';')
+            _,ext = head.split('/')
+            _,msg = tail.split(',')
+            name_product = product_name.replace(" ","_")
+
+            with open(join(paths, name_product+ str(i) +"."+ext), "wb") as fh:
+                fh.write(base64.b64decode(msg))
+            new_image.append(name_product+ str(i) +"."+ext)
+            i+=1
+        else:
+            _,_,tail = image.split('/')
+            new_image.append(tail)
     run_query(insert(product).values({f"title":product_name, "product_detail":description, "image_url":new_image, \
         "condition":condition, "categories_id":category, "price":price, "soft_delete":False}), commit=True)
     return {"message": "Product added"}, 200
 
 @admin_product_bp.route("/products", methods=["PUT"])
 def update_product(): #ADMIN
+    product = Table("product", MetaData(bind=get_engine()), autoload=True)
     token = str(request.headers.get('Authentication'))
             
     body=request.json
@@ -63,23 +71,40 @@ def update_product(): #ADMIN
     price = body["price"]
     product_id = body["product_id"]
     
+    paths = join(dirname(realpath(__file__)), 'static/')
+    new_image = []
+    i = 1
+    for image in images:
+        if 'data' in image[0:4]:
+            head,tail = image.split(';')
+            _,ext = head.split('/')
+            _,msg = tail.split(',')
+            name_product = product_name.replace(" ","_")
+
+            with open(join(paths, name_product+ str(i) +"."+ext), "wb") as fh:
+                fh.write(base64.b64decode(msg))
+            new_image.append(name_product+ str(i) +"."+ext)
+            i+=1
+        else:
+            _,_,tail = image.split('/')
+            new_image.append(tail)
+
     data = run_query(f"SELECT from product WHERE id={product_id}")
     if len(data) < 1:
         return {"error": "Product id not found"}, 401
     else:
-        run_query(f"UPDATE product SET title = '{product_name}', product_detail = '{description}', image_url='{images}',\
-            condition = '{condition}', categories_id = '{category}', price = '{price}', id = '{product_id}' WHERE id='{product_id}'", commit=True)
+        run_query(product.update().where(product.c.id==product_id).values({f"title":product_name, "product_detail":description, "image_url":new_image, \
+        "condition":condition, "categories_id":category, "price":price}), commit=True)
         return{"message" : "Product updated"}, 200
 
 @admin_product_bp.route("/products/<path:id>", methods=["DELETE"])
 def soft_delete_product(id): #ADMIN
-    token = str(request.headers.get('token'))
-    admin_token_checker(token)
+    token = str(request.headers.get('Authentication'))
+    # admin_token_checker(token)
     
     data = run_query(f"SELECT from product WHERE id={id}")
     if len(data) < 1:
         return {"error": "Product id not found"}, 401
     else:
-        run_query(f"UPDATE product SET soft_delete=True \
-        WHERE id={id}", commit=True)
+        run_query(f"DELETE FROM product WHERE id={id}", commit=True)
         return {"message": "Product deleted"}, 200

@@ -31,7 +31,7 @@ def getproduct_list():
         else:
             data = [{
                 "id": d["id"],
-                "image": [join('/image/',d) for d in d['image']],
+                "image": join('/image/',d['image'][0]),
                 "title": d["title"],
                 "price": d["price"]
             }for d in data]
@@ -102,7 +102,7 @@ def getproduct_list():
     else:
         data = [{
             "id": d["id"],
-            "image": [join('/image/',d) for d in d['image']],
+            "image": join('/image/',d['image'][0]),
             "title": d["title"],
             "price": d["price"]
         }for d in data]
@@ -110,7 +110,7 @@ def getproduct_list():
 
 @product_bp.route("/products/<int:id>", methods=["GET"])
 def getproducts_detail(id):
-    data = run_query(f"SELECT p.id, p.title, p.brand_name, p.size, p.product_detail, p.price, p.image_url, \
+    data = run_query(f"SELECT p.id, p.title, p.size, p.product_detail, p.price, p.image_url, \
         p.categories_id AS category_id, c.title AS category_name FROM product p \
         RIGHT JOIN categories c ON p.categories_id = c.id \
         WHERE p.id={id} ")
@@ -123,7 +123,7 @@ def getproducts_detail(id):
             "size": d["size"],
             "product_detail": d["product_detail"],
             "price": d["price"],
-            "images_url": [join('/image/', d["image_url"])],
+            "images_url": [join('/image/', d) for d in d['image_url']],
             "category_id": d["category_id"],
             "category_name":d["category_name"]
         } for d in data]

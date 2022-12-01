@@ -71,6 +71,5 @@ def soft_delete_category(id): #DONE
     if len(data)<1:
         return{"error": "Category not found"}, 401
     else:
-        run_query(f"UPDATE categories SET soft_delete=True \
-            WHERE id='{id}'", commit=True)
+        run_query(f"DELETE FROM categories WHERE id='{id}'", commit=True)
         return{"message": "Category deleted"}, 200
