@@ -12,5 +12,8 @@ def get_total_sales():  #DONE
     
     data = run_query(f"SELECT balance as total FROM users \
                         WHERE type='seller'")
-    data = [d['balance'] for d in data]
-    return { "data": data[0] }, 200   
+    data = [d['total'] for d in data]
+    return { "data": {
+        "total":data[0]
+        }
+    }, 200   

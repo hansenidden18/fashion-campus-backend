@@ -31,8 +31,6 @@ def shipping_address():
     
     token = str(request.headers.get('Authentication'))
     verif = jwt_verification(token)
-    if "message" in verif:
-        return {"error": "User token expired, please re-login"}, 403
 
     body = request.json
     

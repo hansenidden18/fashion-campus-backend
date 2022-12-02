@@ -25,28 +25,16 @@ def create_category(): #DONE
 
 @categories_bp.route("/categories", methods=["GET"])
 def get_category(): #BISA USER ATAU ADMIN
-    token = str(request.headers.get('Authentication'))
-    
-    if admin_token_checker(token):
-        data = run_query(f"SELECT * FROM categories")
-        if len(data) < 1:
-            return {"error" : "Category not found"}, 400
-        else:
-            data = [{
-                "id": d["id"],
-                "title": d["title"]
-            } for d in data]
-            return {"data": data}, 200
+
+    data = run_query(f"SELECT * FROM categories")
+    if len(data) < 1:
+        return {"error" : "Category not found"}, 400
     else:
-        data = run_query(f"SELECT * FROM categories WHERE soft_delete != True")
-        if len(data) < 1:
-            return {"error" : "Category not found"}, 400
-        else:
-            data = [{
-                "id": d["id"],
-                "title": d["title"]
-            } for d in data]
-            return {"data": data}, 200
+        data = [{
+            "id": d["id"],
+            "title": d["title"]
+        } for d in data]
+        return {"data": data}, 200
         
         
 @categories_bp.route("/categories/<path:id>", methods=["PUT"])

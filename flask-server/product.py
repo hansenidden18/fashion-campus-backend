@@ -24,6 +24,7 @@ categories_id = category
 @product_bp.route("/products", methods=["GET"])
 def getproduct_list():
     token = str(request.headers.get('Authentication'))
+    
     if admin_token_checker(token):
         data = run_query(f"SELECT id, image_url AS image, title, price FROM product")
         if len(data) < 1:
@@ -53,11 +54,9 @@ def getproduct_list():
         sort = "DESC"
     else:
         sort = "ASC"
-        return {"error" : "sort_by must be 'price_a_z' or 'price_z_a'!"}, 400
-    offset = page * page_size
-    verif = run_query(f'SELECT * FROM product')
-    if len(verif) >= 1:
-        offset = 0
+    
+    offset = (page - 1) * page_size
+
     if not condition and not product_name and not category:
         data = run_query(f"SELECT id, image_url AS image, title, price \
                             FROM product WHERE price <= {price} \
@@ -129,11 +128,19 @@ def getproducts_detail(id):
         } for d in data]
         return { "data": data[0] }, 200
     
-# @product_bp.route("/search_image", methods=["POST"])
+# @product_bp.route("/products/search_image", methods=["POST"])
 # def search_product():  #TUNGGU TIM AI
 #     body = request.json
-#     images = body["image"]
+#     image = body["image"]
     
+#     head,tail = image.split(';')
+#     _,ext = head.split('/')
+#     _,msg = tail.split(',')
+    
+
+#     with open(join(paths, name_product +"."+ext), "wb") as fh:
+#         fh.write(base64.b64decode(msg))
+#     new_image.append(name_product+ str(i) +"."+ext)
 #     data = run_query(f"SELECT categories_id \
 #         FROM product \
 #         WHERE image_url = '{images}'")

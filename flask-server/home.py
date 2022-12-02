@@ -23,7 +23,7 @@ def get_banner():
 @home_bp.route("/home/category", methods=["GET"])
 def get_category():
     data = run_query (f'''SELECT product.id, product.image_url, categories.title  FROM product 
-                            JOIN categories ON categories.id=product.categories_id ORDER BY categories.title ASC''')
+                            JOIN categories ON categories.id=product.categories_id ORDER BY categories.title ASC LIMIT 4''')
     
     if data:
         data = {"data":[{

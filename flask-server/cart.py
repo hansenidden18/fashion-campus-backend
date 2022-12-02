@@ -65,8 +65,6 @@ def get_shipping():
 
     token = str(request.headers.get('Authentication'))
     verif = jwt_verification(token)
-    if "message" in verif:
-        return {"error": "User token expired, please re-login"}, 403
 
     user_id = first(f"SELECT id FROM users WHERE email='{verif['email']}' AND password='{verif['password']}'")
     data = run_query(f"SELECT * FROM user_address WHERE user_id={user_id['id']}")
@@ -132,14 +130,14 @@ def create_order():
         quantity = [d['quantity'] for d in data]
         size = [ d['size'] for d in data]
         product_id = [d['name'] for d in data]
-        data = [d['price']*d['quantity'] for d in data]
-    
-    total_price  = sum(data)
+        total_price = [d['price']*d['quantity'] for d in data]
+        data = [d['id'] for d in data]
+    total_price  = sum(total_price)
     if shipping_method == "regular":
         price = regular_fee(total_price)
     else:
         price = next_fee(total_price)
-
+    
     run_query(f'''INSERT INTO user_address(user_id, name, phone_number, address, city) VALUES {
         user_id['id'],
         name,
@@ -165,6 +163,18 @@ def create_order():
         product_id[0]
         }''', commit=True)
 
+    curr_balance = run_query(f"SELECT balance FROM users WHERE type='seller'")
+    curr_balance = [d['balance'] for d in curr_balance]
+    curr_balance = curr_balance[0]
+    curr_balance += total_price
+    run_query(f"UPDATE users SET balance={curr_balance} WHERE type='seller'",commit=True)
+
+    buy_balance = run_query(f"SELECT balance FROM users WHERE id={user_id['id']}")
+    buy_balance = [d['balance'] for d in buy_balance]
+    buy_balance = buy_balance[0]
+    buy_balance -= total_price
+    run_query(f"UPDATE users SET balance={buy_balance} WHERE id={user_id['id']}",commit=True)
+    run_query(f"DELETE FROM cart WHERE id={data[0]}")
     return {"message":"order success"}, 200
 
 @cart_bp.route("/cart/<int:cart_id>", methods=["DELETE"])

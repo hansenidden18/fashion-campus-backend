@@ -53,11 +53,14 @@ def productid_checker(id):
     return run_query(f"SELECT * FROM product WHERE id={id}")
 
 def admin_token_checker(token):
-    verif = jwt_verification(token)
-    usercheck = run_query(f"SELECT * FROM users WHERE email='{verif['email']}' and type='seller'")
-    if not usercheck:
+    try:
+        verif = jwt_verification(token)
+        usercheck = run_query(f"SELECT * FROM users WHERE email='{verif['email']}' and type='seller'")
+        if not usercheck:
+            return False
+        return True
+    except jwt.exceptions.DecodeError:
         return False
-    return True
 
 def user_token_checker(token):
     verif = jwt_verification(token)

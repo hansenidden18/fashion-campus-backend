@@ -29,3 +29,5 @@
 # INSERT INTO product(title, brand_name, size, product_detail, image_url, condition, price, categories_id) VALUES('sneak nyeker', 'BALENCIAGA', '{S,M,L}', 'Si paling hypebeast', 'sneaker.jpg', 'new', 1100000, 8);
 # INSERT INTO product(title, brand_name, size, product_detail, image_url, condition, price, categories_id) VALUES('TRUSS SEOUR', 'BALENC', '{S,M,L}', 'Si paling trouser', 'trouser.jpeg', 'new', 1100000, 2);
 
+# INSERT INTO cart(quantity, size, price, image, name, customer_id) VALUES(3, 'L', 300000, 'pullover.jpg', 3, 1);
+# INSERT INTO cart(quantity, size, price, image, name, customer_id) VALUES(3, 'L', 300000, 'pullover.jpg', 3, 1);
