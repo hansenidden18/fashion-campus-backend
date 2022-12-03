@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from utils import get_engine, jwt_verification, run_query, admin_token_checker, user_token_checker
 from sqlalchemy import insert, Table, MetaData
 from flask_cors import CORS
+import json
 from os.path import join
 from nn.predictor import predict_image
 
@@ -45,7 +46,7 @@ def getproduct_list():
     page_size = params("page_size", type=int)
     sort_by = params("sort_by", type=str)
     category = params("category", type=int)
-    price = params("price", type=int) or 1000000
+    price = params("price", type=int) or 10000000
     condition = params("condition", type=str)
     product_name = params("product_name", type=str)
     
@@ -134,20 +135,6 @@ def search_product():  #TUNGGU TIM AI
     body = request.json
     image = body["image"]
     
-    head,tail = image.split(';')
-    _,ext = head.split('/')
-    _,msg = tail.split(',')
-    
-    category = predict_image(msg)
-
-    return {"category_id": category+1}, 200
-    # with open(join(paths, name_product +"."+ext), "wb") as fh:
-    #     fh.write(base64.b64decode(msg))
-    # new_image.append(name_product+ str(i) +"."+ext)
-    # data = run_query(f"SELECT categories_id \
-    #     FROM product \
-    #     WHERE image_url = '{images}'")
-    # if len(data) < 1:
-    #     return{"error": "Images not found"}, 400
-    # else:
-    #     return {"data": data, "message":"Search product success"}, 200
+    category = predict_image(image)
+    category += 1
+    return {"category": int(category)}, 200
