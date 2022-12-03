@@ -5,4 +5,9 @@ flask-sqlalchemy
 sqlalchemy-utils
 Flask-Migrate==2.6.0
 Flask-Script
+flask-cors
 pyjwt
+Pillow
+numpy==1.23.5
+torch==1.13.0
+torchvision==0.14.0
