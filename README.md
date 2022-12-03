@@ -15,10 +15,10 @@ docker-compose up --build -d
 docker exec -it final-project-startup-campus-flask-app-1 /bin/sh
 ```
 
-* See if ```flask-server``` exist
+* See if ```FashionCampus``` exist
 ```
 ls
-cd flask-server
+cd FashionCampus
 ```
 
 * Migrate the database
